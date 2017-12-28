@@ -12,15 +12,21 @@ def main():
     #check the status of the file
     if(os.stat("listWeb.txt").st_size == 0):
         start_up(file)
+        read_file(open("listWeb.txt","r" ))
+
     else: 
         read_file(open("listWeb.txt","r" ))
 
 #initializing the webpages on the txt file
 def start_up(file):
-    jumlah_web = input("please the number of web that u want to enter? ")
-    for i in range(int(jumlah_web)):
-        webpage = input("enter your webpage: ")
-        add_web_to_file(file, webpage)
+    try:
+        jumlah_web = input("please the number of web that u want to enter? ")
+        for i in range(int(jumlah_web)):
+            webpage = input("enter your webpage: ")
+            add_web_to_file(file, webpage)
+    except ValueError:
+        print("Please enter an Integer!")
+        start_up(file)
 
 #read the contents of the file
 def read_file(file):
