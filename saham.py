@@ -1,4 +1,4 @@
-#TODO make GUI App
+
 #TODO make exceptions for user 
 import requests
 from bs4 import BeautifulSoup
@@ -66,10 +66,17 @@ def print_detail(data):
 #user can add the website manually from the txt
 #the site can only come from bloomberg
 def add_web_to_file(file, webpage):
-    file.write(webpage+",")
+    if("https://www.bloomberg.com/" in webpage):
+        url = requests.get(webpage)
+        if(url == 200):
+            file.write(webpage+",")
+
+    else:
+        print("Please enter a valid website")
+        
 
 
-
+#Starting the program
 main()
 
 
