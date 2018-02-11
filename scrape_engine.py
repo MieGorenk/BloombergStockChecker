@@ -4,17 +4,19 @@ import lxml
 import os
 import json
 
+
+
 # this function will retrieve the urls from txt file 
 # and then will return string of urls
 def retrieve_urls():
-  file = open("urls.txt", "a+")
+  file = open("data/urls.txt", "a+")
   urls = file.read().split(",")
   return urls
 
 # this function will scrape the content of the website
 # and return the stock info in a dictionary
 def scrape_web(url):
-  site = requests.get(url)
+  site = requests.get(url, verify='data/ca-cert.pem')
   soup = BeautifulSoup(site.content, 'lxml')
   info = set_info_to_json(soup)
 
@@ -38,27 +40,28 @@ def set_info_to_json(soup):
   write_json(info)
 
 def write_json(info):
-    if os.stat("data.json").st_size == 0:
-      with open('data.json', 'w') as file:
+    if os.stat("data/data.json").st_size == 0:
+      with open('data/data.json', 'w') as file:
         json.dump(info, file)
     else:
       data = read_json()
       data.update(info)
-      with open('data.json', 'w') as file:
+      with open('data/data.json', 'w') as file:
         json.dump(data, file)
   
 def read_json():
-  with open('data.json') as file:
+  with open('data/data.json') as file:
     data = json.load(file)
   return data
 
 def refresh_data():
-  file = open('urls.txt', 'r')
+  file = open('data/urls.txt', 'r+')
   urls = file.read().split(",")
+  print('gajluk')
   print(urls)
 
   # delete the content to be refreshed
-  json_data = open('data.json', 'w')
+  json_data = open('data/data.json', 'w')
   json_data.seek(0)
   json_data.truncate()
 
@@ -71,7 +74,7 @@ def refresh_data():
 # this function will add url to the txt 
 # and will check if the url is from bloomberg & reachable
 def add_url_to_file(url):
-  file = open("urls.txt", "a+")
+  file = open("data/urls.txt", "a+")
   if("bloomberg.com" in url):
     webpage = requests.get(url)
     if(webpage.status_code == 200):

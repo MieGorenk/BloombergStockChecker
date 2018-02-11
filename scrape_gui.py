@@ -2,7 +2,7 @@ import sys
 from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QPushButton, QAction, QMessageBox, QGridLayout, QLabel,QComboBox, QLineEdit, QHBoxLayout, QVBoxLayout
-from scrape_engine import retrieve_urls, scrape_web, add_url_to_file, refresh_data
+from scrape_engine import retrieve_urls, scrape_web, add_url_to_file, refresh_data, write_json, read_json
 import json
 
 
@@ -111,15 +111,10 @@ class MainApp(QWidget):
     refresh_data()
     self.add_comboBox_item(self.combobox)
 
-  def read_json_data(self):
-    with open('data.json') as file:
-      data = json.load(file)
-
-    return data
     
 
   def add_comboBox_item(self, combobox):
-    stock_names = self.read_json_data()
+    stock_names = read_json()
     self.combobox.clear()
     for i in stock_names.keys():
       combobox.addItem(i)
@@ -127,7 +122,7 @@ class MainApp(QWidget):
     combobox.activated[str].connect(self.check_stock)
 
   def check_stock(self, name):
-    stock_names = self.read_json_data()
+    stock_names = read_json()
     data = stock_names[name]
     for i in range(0, len(self.widgets)):
       if i == 19:
