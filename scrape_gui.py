@@ -1,15 +1,17 @@
 import sys
-from PyQt5.QtCore import QCoreApplication
+from PyQt5.QtCore import QCoreApplication, QThreadPool, QRunnable
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QPushButton, QAction, QMessageBox, QGridLayout, QLabel,QComboBox, QLineEdit, QHBoxLayout, QVBoxLayout
 from scrape_engine import retrieve_urls, scrape_web, add_url_to_file, refresh_data, write_json, read_json
 import json
+import time
 
 
 # The root window of the app
 class MainWindow(QMainWindow):
   def __init__(self, parent=None):
     super(MainWindow, self).__init__()
+    self.threadPool = QThreadPool()
     self.main_app = MainApp() 
     self.setCentralWidget(self.main_app) 
 
@@ -75,6 +77,7 @@ class MainApp(QWidget):
     grid = QGridLayout()
     self.setLayout(grid)
     self.widgets = []
+    self.threads = QThreadPool()
 
     names = ['Stocks', 'stock_combobox', 'x', 'x', 'x', 'refresh', 
               'Name', '', 'x', 'x', 'x', 'x', 
@@ -108,18 +111,19 @@ class MainApp(QWidget):
     
 
   def refreshBtn_pressed(self):
-    refresh_data()
-    self.add_comboBox_item(self.combobox)
+    requester = DataRequester(self.combobox, self.add_comboBox_item)
+    self.threads.start(requester)
+    #self.add_comboBox_item(self.combobox)
 
     
 
-  def add_comboBox_item(self, combobox):
+  def add_comboBox_item(self):
     stock_names = read_json()
     self.combobox.clear()
     for i in stock_names.keys():
-      combobox.addItem(i)
+      self.combobox.addItem(i)
     
-    combobox.activated[str].connect(self.check_stock)
+    self.combobox.activated[str].connect(self.check_stock)
 
   def check_stock(self, name):
     stock_names = read_json()
@@ -132,25 +136,20 @@ class MainApp(QWidget):
           if k == self.widgets[i].text():
             self.widgets[i+1].setText(v)
           
-            
-            
+class DataRequester(QRunnable):
+
+  #@pyqtSlot()
+  def __init__(self, combobox, add_item_to_combobox):
+    super(DataRequester, self).__init__()
+    self.combobox =  combobox
+    self.addFunction = add_item_to_combobox
+
+  def run(self):
+    refresh_data()
+    self.addFunction()
+    time.sleep(120)
+    self.run()
     
-      
-        
-          
-
-
-
-        # print(stock_names[i])
-        # for key, value in stock_names[i].items():
-        #   print(key+": " + value)
-        
-
-    
-
-
-
-
 
 
 
