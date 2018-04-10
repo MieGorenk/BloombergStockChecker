@@ -5,7 +5,6 @@ import os
 import json
 
 
-
 # this function will retrieve the urls from txt file 
 # and then will return string of urls
 def retrieve_urls():
@@ -16,15 +15,13 @@ def retrieve_urls():
 # this function will scrape the content of the website
 # and return the stock info in a dictionary
 def scrape_web(url):
+  print('scrape')
   site = requests.get(url, verify='data/ca-cert.pem')
   soup = BeautifulSoup(site.content, 'lxml')
-  info = set_info_to_json(soup)
-
-# this function will get the necesary info of the stock
-def get_info(soup):
-  pass
+  set_info_to_json(soup)
 
 def set_info_to_json(soup):
+  print('set info')
   name = soup.find("span", class_="companyId__87e50d5a").text
   info = {name : 
           {'Name': soup.find("h1", class_ = "companyName__99a4824b").text,
@@ -40,14 +37,15 @@ def set_info_to_json(soup):
   write_json(info)
 
 def write_json(info):
-    if os.stat("data/data.json").st_size == 0:
-      with open('data/data.json', 'w') as file:
-        json.dump(info, file)
-    else:
-      data = read_json()
-      data.update(info)
-      with open('data/data.json', 'w') as file:
-        json.dump(data, file)
+
+  if os.stat("data/data.json").st_size == 0:
+    with open('data/data.json', 'w') as file:
+      json.dump(info, file)
+  else:
+    data = read_json()
+    data.update(info)
+    with open('data/data.json', 'w') as file:
+      json.dump(data, file)
   
 def read_json():
   with open('data/data.json') as file:
@@ -64,6 +62,7 @@ def refresh_data():
   json_data = open('data/data.json', 'w')
   json_data.seek(0)
   json_data.truncate()
+  print('dilet json')
 
   for i in urls:
     if i == "":
@@ -86,10 +85,3 @@ def add_url_to_file(url):
 
   else:
       return "NOT VALID"
-
-
-
-  
-
-
-
